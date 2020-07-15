@@ -34,7 +34,9 @@ func NewRouter() (*fizz.Fizz, error) {
 	fizz.GET("/openapi.json", nil, fizz.OpenAPI(infos, "json"))
 
 	// Setup routes.
-	routes(fizz.Group("/market", "market", "Your daily dose of freshness"))
+	routes(fizz.Group("/fruit", "fruit", "Your daily dose of freshness fruit"))
+	vRoutes(fizz.Group("/vegetable", "vegetable", "Your daily dose of freshness vegetable"))
+
 
 	if len(fizz.Errors()) != 0 {
 		return nil, fmt.Errorf("fizz errors: %v", fizz.Errors())
@@ -62,4 +64,33 @@ func routes(grp *fizz.RouterGroup) {
 		fizz.Response("400", "Bad request", nil, nil),
 		fizz.Header("X-Market-Listing-Size", "Listing size", fizz.Long),
 	}, tonic.Handler(ListFruits, 200))
+
+	grpx := grp.Group("/u","u", "Your daily dose of freshness uuuuu")
+	grpx.GET("",[]fizz.OperationOption{
+		fizz.Summary("List the fruits of the market"),
+		fizz.Response("400", "Bad request", nil, nil),
+		fizz.Header("X-Market-Listing-Size", "Listing size", fizz.Long),
+	}, tonic.Handler(ListFruitsUUU, 200))
+}
+
+func vRoutes(grp *fizz.RouterGroup) {
+	// Add a new fruit to the market.
+	grp.POST("", []fizz.OperationOption{
+		fizz.Summary("Add a vegetable to the market"),
+		fizz.Response("400", "Bad request", nil, nil),
+	}, tonic.Handler(CreateVegetable, 200))
+
+	// Remove a fruit from the market,
+	// probably because it rotted.
+	grp.DELETE("/:name", []fizz.OperationOption{
+		fizz.Summary("Remove a vegetable from the market"),
+		fizz.Response("400", "Vegetable not found", nil, nil),
+	}, tonic.Handler(DeleteVegetable, 204))
+
+	// List all available fruits.
+	grp.GET("", []fizz.OperationOption{
+		fizz.Summary("List the vegetables of the market"),
+		fizz.Response("400", "Bad request", nil, nil),
+		fizz.Header("X-Market-Listing-Size", "Listing size", fizz.Long),
+	}, tonic.Handler(ListVegetables, 200))
 }
